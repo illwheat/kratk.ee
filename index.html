@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zkracovač URL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">URL Shortener</h1>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="url">
+                Vložte URL k zkrácení:
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="url" type="text" placeholder="https://www.example.com">
+        </div>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline" onclick="shortenUrl()">
+            Zkrátit URL
+        </button>
+        <div id="shortenedUrl" class="mt-6 hidden">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                Zkrácená URL:
+            </label>
+            <div class="flex items-center">
+                <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="shortUrl" type="text" readonly>
+                <button class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded ml-2 focus:outline-none focus:shadow-outline" onclick="copyToClipboard()">
+                    Kopírovat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function shortenUrl() {
+            const url = document.getElementById('url').value;
+            const response = await fetch('/shorten', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('shortUrl').value = data.shortUrl;
+                document.getElementById('shortenedUrl').classList.remove('hidden');
+            } else {
+                alert('Chyba při zkracování URL.');
+            }
+        }
+
+        function copyToClipboard() {
+            const shortUrl = document.getElementById('shortUrl');
+            shortUrl.select();
+            document.execCommand('copy');
+            alert('Zkrácená URL zkopírována do schránky.');
+        }
+    </script>
+</body>
+</html>
